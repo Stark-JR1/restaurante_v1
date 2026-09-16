@@ -20,7 +20,34 @@ jobs:
       - name: Reconstruir projeto
         shell: bash
         run: |
-          cat .project_archive/part*.b64 > /tmp/restaurante.zip.b64
+          cat \
+            .project_archive/part01.b64 \
+            .project_archive/part02.b64 \
+            .project_archive/part03.b64 \
+            .project_archive/part04.b64 \
+            .project_archive/part05.b64 \
+            .project_archive/part06.b64 \
+            .project_archive/part07_01.b64 \
+            .project_archive/part07_02.b64 \
+            .project_archive/part07_03.b64 \
+            .project_archive/part07_04.b64 \
+            .project_archive/part07_05.b64 \
+            .project_archive/part07_06.b64 \
+            .project_archive/part07_07.b64 \
+            .project_archive/part07_08.b64 \
+            .project_archive/part07_09.b64 \
+            .project_archive/part07_10.b64 \
+            .project_archive/part07_11.b64 \
+            .project_archive/part08_01.b64 \
+            .project_archive/part08_02.b64 \
+            .project_archive/part08_03.b64 \
+            .project_archive/part08_04.b64 \
+            .project_archive/part08_05.b64 \
+            .project_archive/part08_06.b64 \
+            .project_archive/part08_07.b64 \
+            .project_archive/part08_08.b64 \
+            .project_archive/part08_09.b64 \
+            > /tmp/restaurante.zip.b64
           base64 -d /tmp/restaurante.zip.b64 > /tmp/restaurante.zip
           rm -rf /tmp/restaurante-src
           mkdir -p /tmp/restaurante-src
