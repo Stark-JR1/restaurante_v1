@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Auditoria de Refeições — SISTERMI</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/static/css/app.css">
+</head>
+<body>
+  <header class="topbar">
+    <div class="brand">
+      <div class="brand-badge">SISTERMI</div>
+      <div class="brand-title">Sistema de Auditoria de Refeições</div>
+    </div>
+
+    <div class="topbar-actions">
+      <button class="icon-btn" type="button" aria-label="Alternar tema">☾</button>
+      <button class="icon-btn" type="button" aria-label="Ajuda">?</button>
+      <span class="version">v2.0.0 — PLANILHA NOVA</span>
+    </div>
+  </header>
+
+  <main class="audit-shell">
+    <aside class="audit-sidebar">
+      <div class="side-card upload-block">
+        <div class="section-label">📄 1. CARTÃO DE PONTO (PDF)</div>
+        <label class="upload-zone" id="drop-pdf" for="pdf_ponto">
+          <input type="file" id="pdf_ponto" name="pdf_ponto" accept=".pdf" multiple hidden>
+          <div class="upload-icon">📄</div>
+          <div>Arraste e solte o PDF aqui</div>
+          <small>ou clique para selecionar</small>
+        </label>
+        <div class="file-pill" id="pdf-file-pill">
+          <span class="file-ok">✓</span>
+          <div>
+            <strong id="nome-pdf"></strong>
+            <small id="size-pdf"></small>
+          </div>
+          <button type="button" class="file-remove" data-target="pdf">×</button>
+        </div>
+      </div>
+
+      <div class="side-card upload-block">
+        <div class="section-label">📊 2. PLANILHA DE REFEIÇÕES (EXCEL)</div>
+        <label class="upload-zone" id="drop-xls" for="excel_refeicoes">
+          <input type="file" id="excel_refeicoes" name="excel_refeicoes" accept=".xlsx,.xls" hidden>
+          <div class="upload-icon">📊</div>
+          <div>Arraste e solte o Excel aqui</div>
+          <small>ou clique para selecionar</small>
+        </label>
+        <div class="file-pill" id="xls-file-pill">
+          <span class="file-ok">✓</span>
+          <div>
+            <strong id="nome-xls"></strong>
+            <small id="size-xls"></small>
+          </div>
+          <button type="button" class="file-remove" data-target="xls">×</button>
+        </div>
+      </div>
+
+      <div class="erro-box" id="erro-box"></div>
+
+      <button class="run-audit-btn" id="btn-analisar" type="button">
+        <span>▶</span>
+        EXECUTAR AUDITORIA
+      </button>
+
+      <div id="loader">
+        <span class="spinner"></span> PROCESSANDO AUDITORIA...
+      </div>
+
+      <div class="side-card audit-info-card">
+        <div class="section-label">ⓘ INFORMAÇÕES DA AUDITORIA</div>
+        <div class="info-row">
+          <span>Período da planilha:</span>
+          <strong id="periodo-planilha">—</strong>
+        </div>
+        <div class="info-row">
+          <span>Colaboradores identificados:</span>
+          <strong id="total-colaboradores">—</strong>
+        </div>
+        <div class="info-row">
+          <span>Última auditoria:</span>
+          <strong id="ultima-auditoria">—</strong>
+        </div>
+      </div>
+    </aside>
+
+    <section class="audit-main">
+      <div class="main-header">
+        <div class="main-title-block">
+          <div class="users-icon">👥</div>
+          <div>
+            <h1 id="main-title">Todos os colaboradores</h1>
+            <div class="main-meta">
+              Matrícula: <strong id="meta-matricula">Todos</strong>
+              <span>•</span>
+              Período: <strong id="meta-periodo">—</strong>
+            </div>
+          </div>
+        </div>
+
+        <div class="export-menu">
+          <button class="export-btn" id="btn-export" type="button">
+            ⬇ EXPORTAR RELATÓRIO
+            <span>⌄</span>
+          </button>
+          <div class="export-options" id="export-options">
+            <button type="button" id="btn-export-excel">Exportar Excel</button>
+            <button type="button" id="btn-export-pdf">Exportar PDF</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="kpi-grid">
+        <div class="kpi-card kpi-total">
+          <div class="kpi-icon">🍴</div>
+          <div>
+            <strong id="kpi-total">0</strong>
+            <span>TOTAL REFEIÇÕES</span>
+            <small id="kpi-total-pct">100% do total</small>
+          </div>
+        </div>
+        <div class="kpi-card kpi-ok">
+          <div class="kpi-icon">✓</div>
+          <div>
+            <strong id="kpi-ok">0</strong>
+            <span>VÁLIDAS (OK)</span>
+            <small id="kpi-ok-pct">0% do total</small>
+          </div>
+        </div>
+        <div class="kpi-card kpi-glosa">
+          <div class="kpi-icon">×</div>
+          <div>
+            <strong id="kpi-glosa">0</strong>
+            <span>GLOSAS</span>
+            <small id="kpi-glosa-pct">0% do total</small>
+          </div>
+        </div>
+        <div class="kpi-card kpi-revisao">
+          <div class="kpi-icon">⚠</div>
+          <div>
+            <strong id="kpi-revisao">0</strong>
+            <span>REVISÕES / EXCEÇÕES</span>
+            <small id="kpi-revisao-pct">0% do total</small>
+          </div>
+        </div>
+      </div>
+
+      <div class="filter-bar">
+        <button class="filter-chip active" data-status="TODOS">TODOS</button>
+        <button class="filter-chip" data-status="OK">✓ OK</button>
+        <button class="filter-chip" data-status="GLOSA">× GLOSA</button>
+        <button class="filter-chip" data-status="EXCEÇÃO">👤 EXCEÇÃO</button>
+        <button class="filter-chip" data-status="ALERTA">⚠ ALERTA</button>
+        <button class="filter-chip" data-status="PENDENTE">◷ PENDENTE</button>
+        <button class="filter-chip" data-status="DIVERGÊNCIA">⚖ DIVERGÊNCIA</button>
+      </div>
+
+      <div class="table-toolbar">
+        <div class="search-box">
+          <span>⌕</span>
+          <input id="search-input" type="search" placeholder="Pesquisar por matrícula, nome, data, tipo, status ou descrição...">
+        </div>
+        <label class="page-size">
+          LINHAS POR PÁGINA
+          <select id="page-size">
+            <option value="25">25</option>
+            <option value="50">50</option>
+            <option value="100">100</option>
+          </select>
+        </label>
+      </div>
+
+      <div class="table-card">
+        <div class="table-wrap">
+          <table class="audit-table">
+            <thead>
+              <tr>
+                <th class="sortable" data-sort="matricula">MATRÍCULA <span class="sort-mark"></span></th>
+                <th class="sortable" data-sort="nome">NOME <span class="sort-mark"></span></th>
+                <th class="sortable" data-sort="data">DATA <span class="sort-mark"></span></th>
+                <th class="sortable" data-sort="dia_semana">DIA <span class="sort-mark"></span></th>
+                <th class="sortable" data-sort="tipo_refeicao">TIPO REFEIÇÃO <span class="sort-mark"></span></th>
+                <th class="sortable" data-sort="status">STATUS <span class="sort-mark"></span></th>
+                <th class="sortable" data-sort="descricao">DESCRIÇÃO <span class="sort-mark"></span></th>
+                <th class="sortable" data-sort="acao_recomendada">AÇÃO RECOMENDADA <span class="sort-mark"></span></th>
+              </tr>
+            </thead>
+            <tbody id="tabela-body"></tbody>
+          </table>
+          <div class="no-data" id="no-data">Nenhum registro encontrado.</div>
+        </div>
+        <div class="table-footer">
+          <span id="table-info">Mostrando 0 registros</span>
+          <div class="pagination" id="pagination"></div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <script src="/static/js/app.js"></script>
+</body>
+</html>
